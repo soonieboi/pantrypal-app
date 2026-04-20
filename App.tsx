@@ -26,10 +26,10 @@ function AppTabs() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingBottom: 8, paddingTop: 6, height: 60 },
+          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingBottom: 24, paddingTop: 8, height: 80 },
           tabBarActiveTintColor: t.tabActive,
           tabBarInactiveTintColor: t.tabInactive,
-          tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
           tabBarIcon: ({ color }) => {
             const icons: Record<string, string> = { Inventory: '▦', 'Buy List': '🛒', Household: '👥' };
             return <Text style={{ fontSize: 20, color }}>{icons[route.name] ?? '●'}</Text>;
