@@ -17,6 +17,7 @@ interface AppState {
   inviteCode: string;
   updateQty: (id: number, qty: number) => void;
   updateThreshold: (id: number, threshold: number) => void;
+  updateItem: (id: number, updates: Partial<Omit<Item, 'id' | 'updatedAt'>>) => void;
   addItem: (item: Omit<Item, 'id' | 'updatedAt'>) => void;
   deleteItem: (id: number) => void;
   boughtItem: (id: number, buyQty: number) => void;
@@ -74,6 +75,10 @@ export function AppProvider({ householdId, children }: Props) {
     setDoc(doc(db, 'households', householdId, 'items', String(id)), { minThreshold: threshold, updatedAt: Date.now() }, { merge: true });
   }, [householdId]);
 
+  const updateItem = useCallback((id: number, updates: Partial<Omit<Item, 'id' | 'updatedAt'>>) => {
+    setDoc(doc(db, 'households', householdId, 'items', String(id)), { ...updates, updatedAt: Date.now() }, { merge: true });
+  }, [householdId]);
+
   const addItem = useCallback((item: Omit<Item, 'id' | 'updatedAt'>) => {
     const id = Date.now();
     setDoc(doc(db, 'households', householdId, 'items', String(id)), { ...item, id, updatedAt: Date.now() });
@@ -124,7 +129,7 @@ export function AppProvider({ householdId, children }: Props) {
       householdId, inviteCode,
       theme: THEMES[themeId] ?? THEMES.sage,
       items, members, locations, locIcons,
-      updateQty, updateThreshold, addItem, deleteItem, boughtItem,
+      updateQty, updateThreshold, updateItem, addItem, deleteItem, boughtItem,
       addMember, removeMember, addLocation, deleteLocation,
     }}>
       {children}
