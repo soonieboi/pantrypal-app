@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator, Text } from 'react-native';
+import { View, ActivityIndicator, Text, Platform } from 'react-native';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 
@@ -26,7 +26,7 @@ function AppTabs() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingTop: 10, paddingBottom: 10, height: 135 },
+          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingTop: 8, paddingBottom: Platform.OS === 'web' ? ('env(safe-area-inset-bottom, 16px)' as any) : 8, height: Platform.OS === 'web' ? ('calc(60px + env(safe-area-inset-bottom, 16px))' as any) : 60 },
           tabBarActiveTintColor: t.tabActive,
           tabBarInactiveTintColor: t.tabInactive,
           tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
