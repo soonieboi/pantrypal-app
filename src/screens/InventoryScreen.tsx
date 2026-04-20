@@ -13,7 +13,7 @@ import { Item } from '../types';
 import { groupBy } from '../data';
 
 export function InventoryScreen() {
-  const { theme: t, items, updateQty, updateThreshold, addItem, deleteItem, locations, locIcons, members } = useApp();
+  const { theme: t, items, updateQty, updateThreshold, updateItem, addItem, deleteItem, locations, locIcons, members } = useApp();
   const [search, setSearch] = useState('');
   const [activeLoc, setActiveLoc] = useState('All');
   const [addVisible, setAddVisible] = useState(false);
@@ -35,7 +35,10 @@ export function InventoryScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: t.text }]}>Inventory</Text>
+          <View style={styles.brandRow}>
+            <Text style={styles.brandIcon}>🫙</Text>
+            <Text style={[styles.brandName, { color: t.accent }]}>PantryPal</Text>
+          </View>
           <Text style={[styles.subtitle, { color: t.textSec }]}>
             {items.length} items ·{' '}
             <Text style={{ color: lowCount > 0 ? t.warn : t.textSec }}>{lowCount} need restocking</Text>
@@ -128,9 +131,11 @@ export function InventoryScreen() {
         onClose={() => setSelectedItem(null)}
         onUpdateQty={(id, qty) => { updateQty(id, qty); setSelectedItem(prev => prev ? { ...prev, quantity: qty } : null); }}
         onUpdateThreshold={(id, threshold) => { updateThreshold(id, threshold); setSelectedItem(prev => prev ? { ...prev, minThreshold: threshold } : null); }}
+        onUpdateItem={(id, updates) => { updateItem(id, updates); setSelectedItem(prev => prev ? { ...prev, ...updates } : null); }}
         onDelete={(id) => { deleteItem(id); setSelectedItem(null); }}
         theme={t}
         locIcons={locIcons}
+        locations={locations}
       />
     </SafeAreaView>
   );
@@ -139,7 +144,9 @@ export function InventoryScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  brandIcon: { fontSize: 26 },
+  brandName: { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
   subtitle: { fontSize: 13, marginTop: 2 },
   addBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   addBtnText: { color: '#fff', fontSize: 24, lineHeight: 28 },
