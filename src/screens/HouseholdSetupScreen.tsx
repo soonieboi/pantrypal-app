@@ -5,11 +5,11 @@ import {
 } from 'react-native';
 import {
   doc, setDoc, updateDoc, arrayUnion,
-  collection, getDocs, query, where, writeBatch,
+  collection, getDocs, query, where,
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { THEMES } from '../theme';
-import { LOCATIONS, DEFAULT_LOC_ICONS, INITIAL_ITEMS, MEMBER_PALETTE } from '../data';
+import { MEMBER_PALETTE } from '../data';
 
 function generateCode() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -46,17 +46,10 @@ export function HouseholdSetupScreen() {
         inviteCode,
         createdAt: Date.now(),
         members: [member],
-        locations: LOCATIONS,
-        locIcons: DEFAULT_LOC_ICONS,
+        locations: [],
+        locIcons: {},
         theme: 'sage',
       });
-
-      // Write all initial items in one batch
-      const batch = writeBatch(db);
-      INITIAL_ITEMS.forEach(item => {
-        batch.set(doc(db, 'households', householdId, 'items', String(item.id)), item);
-      });
-      await batch.commit();
 
       // Write user profile
       await setDoc(doc(db, 'users', user.uid), {

@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 import { auth, db } from './src/firebase';
 import { AppProvider, useApp } from './src/AppContext';
@@ -26,7 +26,7 @@ function AppTabs() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1 },
+          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingBottom: 8, paddingTop: 6, height: 60 },
           tabBarActiveTintColor: t.tabActive,
           tabBarInactiveTintColor: t.tabInactive,
           tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
@@ -54,25 +54,26 @@ function Splash() {
 
 export default function App() {
   const [user, setUser] = useState<User | null | undefined>(undefined);
-  const [householdId, setHouseholdId] = useState<string | null>(null);
-  const [checkingHousehold, setCheckingHousehold] = useState(false);
+  const [householdId, setHouseholdId] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (u) => {
+    let unsubUser: (() => void) | null = null;
+    const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
+      if (unsubUser) { unsubUser(); unsubUser = null; }
       if (u) {
-        setCheckingHousehold(true);
-        const userDoc = await getDoc(doc(db, 'users', u.uid));
-        setHouseholdId(userDoc.data()?.householdId ?? null);
-        setCheckingHousehold(false);
+        unsubUser = onSnapshot(doc(db, 'users', u.uid), snap => {
+          setHouseholdId(snap.data()?.householdId ?? null);
+        });
       } else {
         setHouseholdId(null);
       }
     });
+    return () => { unsubAuth(); if (unsubUser) unsubUser(); };
   }, []);
 
   // Loading
-  if (user === undefined || checkingHousehold) return <Splash />;
+  if (user === undefined || householdId === undefined) return <Splash />;
 
   // Not signed in
   if (!user) return <AuthScreen />;

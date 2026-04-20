@@ -51,6 +51,7 @@ export function AddItemSheet({ visible, onClose, onAdd, theme: t, locations, loc
                 onChangeText={v => upd('name', v)}
                 placeholder="e.g. Olive Oil"
                 placeholderTextColor={t.textSec}
+                autoCapitalize="words"
                 style={inputStyle}
               />
 
