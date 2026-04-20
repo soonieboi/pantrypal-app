@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, SafeAr
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useApp } from '../AppContext';
+import { AppHeader } from '../components/AppHeader';
 import { EMOJI_OPTIONS, MEMBER_PALETTE } from '../data';
 
 export function HouseholdScreen() {
@@ -47,15 +48,16 @@ export function HouseholdScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: t.bg }]}>
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.title, { color: t.text }]}>Household</Text>
-          <Text style={[styles.subtitle, { color: t.textSec }]}>Members, categories & stats</Text>
-        </View>
-        <TouchableOpacity onPress={() => { signOut(auth); }} style={[styles.signOutBtn, { borderColor: t.border }]}>
-          <Text style={[styles.signOutText, { color: t.textSec }]}>Sign out</Text>
-        </TouchableOpacity>
-      </View>
+      <AppHeader
+        theme={t}
+        title="Household"
+        subtitle="Members, categories & stats"
+        right={
+          <TouchableOpacity onPress={() => { signOut(auth); }} style={[styles.signOutBtn, { borderColor: t.border }]}>
+            <Text style={[styles.signOutText, { color: t.textSec }]}>Sign out</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Invite code card */}
       {!!inviteCode && (
@@ -198,9 +200,6 @@ export function HouseholdScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 14 },
-  title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-  subtitle: { fontSize: 13, marginTop: 2 },
   signOutBtn: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 6 },
   signOutText: { fontSize: 13 },
   inviteCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginBottom: 16, borderRadius: 14, borderWidth: 1, padding: 16 },
