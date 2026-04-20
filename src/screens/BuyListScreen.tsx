@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { useApp } from '../AppContext';
+import { AppHeader } from '../components/AppHeader';
 import { groupBy, pluralize } from '../data';
 
 export function BuyListScreen() {
@@ -38,19 +39,17 @@ export function BuyListScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: t.bg }]}>
-      <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: t.text }]}>Buy List</Text>
-          <Text style={[styles.subtitle, { color: t.textSec }]}>
-            {needItems.length === 0 ? 'All stocked up!' : `${needItems.length} items below threshold`}
-          </Text>
-        </View>
-        {checkedCount > 0 && (
-          <TouchableOpacity onPress={markBought} style={[styles.boughtBtn, { backgroundColor: t.accent }]}>
-            <Text style={styles.boughtBtnText}>Bought</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <AppHeader
+        theme={t}
+        title="Buy List"
+        subtitle={needItems.length === 0 ? 'All stocked up!' : `${needItems.length} items below threshold`}
+        right={checkedCount > 0
+          ? <TouchableOpacity onPress={markBought} style={[styles.boughtBtn, { backgroundColor: t.accent }]}>
+              <Text style={styles.boughtBtnText}>Bought</Text>
+            </TouchableOpacity>
+          : undefined
+        }
+      />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
         {needItems.length === 0 ? (
@@ -121,9 +120,6 @@ export function BuyListScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
-  title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-  subtitle: { fontSize: 13, marginTop: 2 },
   boughtBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
   boughtBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
   empty: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: 20 },

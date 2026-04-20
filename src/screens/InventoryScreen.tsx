@@ -6,6 +6,7 @@ const GRID_PADDING = 16;
 const GRID_GAP = 8;
 const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2;
 import { useApp } from '../AppContext';
+import { AppHeader } from '../components/AppHeader';
 import { ItemCard } from '../components/ItemCard';
 import { AddItemSheet } from '../components/AddItemSheet';
 import { ItemDetailSheet } from '../components/ItemDetailSheet';
@@ -32,22 +33,16 @@ export function InventoryScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: t.bg }]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <View style={styles.brandRow}>
-            <Text style={styles.brandIcon}>🫙</Text>
-            <Text style={[styles.brandName, { color: t.accent }]}>PantryPal</Text>
-          </View>
-          <Text style={[styles.subtitle, { color: t.textSec }]}>
-            {items.length} items ·{' '}
-            <Text style={{ color: lowCount > 0 ? t.warn : t.textSec }}>{lowCount} need restocking</Text>
-          </Text>
-        </View>
-        <TouchableOpacity onPress={() => setAddVisible(true)} style={[styles.addBtn, { backgroundColor: t.accent }]}>
-          <Text style={styles.addBtnText}>+</Text>
-        </TouchableOpacity>
-      </View>
+      <AppHeader
+        theme={t}
+        title="Inventory"
+        subtitle={<>{items.length} items · <Text style={{ color: lowCount > 0 ? t.warn : t.textSec }}>{lowCount} need restocking</Text></>}
+        right={
+          <TouchableOpacity onPress={() => setAddVisible(true)} style={[styles.addBtn, { backgroundColor: t.accent }]}>
+            <Text style={styles.addBtnText}>+</Text>
+          </TouchableOpacity>
+        }
+      />
 
       {/* Search */}
       <View style={[styles.searchBar, { backgroundColor: t.inputBg, borderColor: t.border }]}>
@@ -143,11 +138,6 @@ export function InventoryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  brandIcon: { fontSize: 26 },
-  brandName: { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
-  subtitle: { fontSize: 13, marginTop: 2 },
   addBtn: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   addBtnText: { color: '#fff', fontSize: 24, lineHeight: 28 },
   searchBar: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginVertical: 8, borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 9, gap: 8 },

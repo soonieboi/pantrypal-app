@@ -1,6 +1,5 @@
 node_modules/
 dist/
-.vercel/
 *.plist
 *.jks
 *.p8
