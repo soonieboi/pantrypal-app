@@ -26,7 +26,7 @@ function AppTabs() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingBottom: 24, paddingTop: 8, height: 80 },
+          tabBarStyle: { backgroundColor: t.navBg, borderTopColor: t.border, borderTopWidth: 1, paddingTop: 10, paddingBottom: 10, height: 135 },
           tabBarActiveTintColor: t.tabActive,
           tabBarInactiveTintColor: t.tabInactive,
           tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
