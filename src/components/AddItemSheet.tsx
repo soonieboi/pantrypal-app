@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Theme } from '../types';
 
+
 interface Props {
   visible: boolean;
   onClose: () => void;
@@ -32,9 +33,12 @@ export function AddItemSheet({ visible, onClose, onAdd, theme: t, locations, loc
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.kav}>
-          <TouchableOpacity activeOpacity={1} style={[styles.sheet, { backgroundColor: t.bg }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.kav}
+      >
+        <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={onClose} />
+        <View style={[styles.sheet, { backgroundColor: t.bg }]}>
             <View style={[styles.handle, { backgroundColor: t.border }]} />
 
             <View style={styles.sheetHeader}>
@@ -120,16 +124,14 @@ export function AddItemSheet({ visible, onClose, onAdd, theme: t, locations, loc
                 <Text style={styles.submitText}>Add to Inventory</Text>
               </TouchableOpacity>
             </ScrollView>
-          </TouchableOpacity>
-        </KeyboardAvoidingView>
-      </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
-  kav: { justifyContent: 'flex-end' },
+  kav: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.45)' },
   sheet: { borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 40, maxHeight: '85%' },
   handle: { width: 36, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: 18 },
   sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
