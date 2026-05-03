@@ -25,6 +25,7 @@ interface AppState {
   removeMember: (id: number) => void;
   addLocation: (name: string, icon: string) => void;
   deleteLocation: (name: string, withItems?: boolean) => void;
+  renameLocation: (oldName: string, newName: string, newIcon: string) => void;
 }
 
 const AppContext = createContext<AppState>(null as any);
@@ -124,13 +125,28 @@ export function AppProvider({ householdId, children }: Props) {
     }
   }, [householdId, locations, locIcons, items]);
 
+  const renameLocation = useCallback((oldName: string, newName: string, newIcon: string) => {
+    if (!newName.trim() || newName === oldName) {
+      const newIcons = { ...locIcons, [oldName]: newIcon };
+      updateDoc(householdRef, { locIcons: newIcons });
+      return;
+    }
+    const newLocations = locations.map(l => l === oldName ? newName : l);
+    const newIcons = { ...locIcons, [newName]: newIcon };
+    delete newIcons[oldName];
+    updateDoc(householdRef, { locations: newLocations, locIcons: newIcons });
+    items.filter(i => i.location === oldName).forEach(i => {
+      setDoc(doc(db, 'households', householdId, 'items', String(i.id)), { location: newName, updatedAt: Date.now() }, { merge: true });
+    });
+  }, [householdId, locations, locIcons, items]);
+
   return (
     <AppContext.Provider value={{
       householdId, inviteCode,
       theme: THEMES[themeId] ?? THEMES.sage,
       items, members, locations, locIcons,
       updateQty, updateThreshold, updateItem, addItem, deleteItem, boughtItem,
-      addMember, removeMember, addLocation, deleteLocation,
+      addMember, removeMember, addLocation, deleteLocation, renameLocation,
     }}>
       {children}
     </AppContext.Provider>

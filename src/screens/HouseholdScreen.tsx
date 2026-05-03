@@ -7,7 +7,7 @@ import { AppHeader } from '../components/AppHeader';
 import { EMOJI_OPTIONS, MEMBER_PALETTE } from '../data';
 
 export function HouseholdScreen() {
-  const { theme: t, items, members, addMember, removeMember, locations, locIcons, addLocation, deleteLocation, inviteCode } = useApp();
+  const { theme: t, items, members, addMember, removeMember, locations, locIcons, addLocation, deleteLocation, renameLocation, inviteCode } = useApp();
   const [showAddMember, setShowAddMember] = useState(false);
   const [memberName, setMemberName] = useState('');
   const [memberEmail, setMemberEmail] = useState('');
@@ -16,6 +16,23 @@ export function HouseholdScreen() {
   const [newCatIcon, setNewCatIcon] = useState('📦');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingLoc, setEditingLoc] = useState<string | null>(null);
+  const [editLocName, setEditLocName] = useState('');
+  const [editLocIcon, setEditLocIcon] = useState('📦');
+  const [showEditEmojiPicker, setShowEditEmojiPicker] = useState(false);
+
+  const startEditLoc = (loc: string) => {
+    setEditingLoc(loc);
+    setEditLocName(loc);
+    setEditLocIcon(locIcons[loc] || '📦');
+    setShowEditEmojiPicker(false);
+  };
+
+  const confirmEditLoc = () => {
+    if (!editingLoc) return;
+    renameLocation(editingLoc, editLocName.trim() || editingLoc, editLocIcon);
+    setEditingLoc(null);
+  };
 
   const inputStyle = [styles.input, { backgroundColor: t.inputBg, borderColor: t.border, color: t.text }];
 
@@ -129,9 +146,9 @@ export function HouseholdScreen() {
           {locations.map((loc, i) => {
             const count = items.filter(it => it.location === loc).length;
             return (
-              <View key={loc} style={[styles.catRow, { borderBottomColor: t.border, borderBottomWidth: i < locations.length - 1 ? 1 : 0 }]}>
+              <View key={loc} style={[styles.catRow, { borderBottomColor: t.border, borderBottomWidth: i < locations.length - 1 ? 1 : 0, flexDirection: 'column', alignItems: 'stretch', gap: 0, padding: 0 }]}>
                 {confirmDelete === loc ? (
-                  <View style={styles.confirmRow}>
+                  <View style={[styles.confirmRow, { padding: 13 }]}>
                     <Text style={[styles.confirmText, { color: t.danger, flex: 1 }]}>Remove {count} item{count !== 1 ? 's' : ''} too?</Text>
                     <TouchableOpacity onPress={() => { deleteLocation(loc, true); setConfirmDelete(null); }} style={[styles.deleteAllBtn, { backgroundColor: t.danger }]}>
                       <Text style={styles.deleteAllText}>Delete all</Text>
@@ -140,15 +157,51 @@ export function HouseholdScreen() {
                       <Text style={[styles.cancelSmallText, { color: t.textSec }]}>Cancel</Text>
                     </TouchableOpacity>
                   </View>
+                ) : editingLoc === loc ? (
+                  <View style={{ padding: 13, gap: 10 }}>
+                    <View style={styles.catAddRow}>
+                      <TouchableOpacity onPress={() => setShowEditEmojiPicker(p => !p)} style={[styles.emojiBtn, { borderColor: t.border, backgroundColor: t.bg }]}>
+                        <Text style={{ fontSize: 22 }}>{editLocIcon}</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        value={editLocName}
+                        onChangeText={setEditLocName}
+                        onSubmitEditing={confirmEditLoc}
+                        autoFocus
+                        placeholderTextColor={t.textSec}
+                        style={[styles.catInput, { backgroundColor: t.inputBg, borderColor: t.border, color: t.text }]}
+                      />
+                    </View>
+                    {showEditEmojiPicker && (
+                      <View style={styles.emojiGrid}>
+                        {EMOJI_OPTIONS.map(e => (
+                          <TouchableOpacity key={e} onPress={() => { setEditLocIcon(e); setShowEditEmojiPicker(false); }} style={[styles.emojiTile, { borderColor: editLocIcon === e ? t.accent : t.border, backgroundColor: editLocIcon === e ? t.accentLight : 'transparent' }]}>
+                            <Text style={{ fontSize: 18 }}>{e}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
+                    <View style={styles.actionRow}>
+                      <TouchableOpacity onPress={() => setEditingLoc(null)} style={[styles.cancelBtn, { borderColor: t.border }]}>
+                        <Text style={[styles.cancelBtnText, { color: t.textSec }]}>Cancel</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={confirmEditLoc} style={[styles.confirmBtn, { backgroundColor: t.accent }]}>
+                        <Text style={styles.confirmBtnText}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 ) : (
-                  <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', padding: 13, gap: 12 }}>
                     <Text style={{ fontSize: 20 }}>{locIcons[loc] || loc[0]}</Text>
                     <Text style={[styles.catName, { color: t.text, flex: 1 }]}>{loc}</Text>
                     <Text style={[styles.catCount, { color: t.textSec }]}>{count} item{count !== 1 ? 's' : ''}</Text>
+                    <TouchableOpacity onPress={() => startEditLoc(loc)} style={[styles.removeBtn, { borderColor: t.border }]}>
+                      <Text style={[styles.removeBtnText, { color: t.textSec }]}>✏️</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleDeleteLoc(loc)} style={[styles.removeBtn, { borderColor: t.border }]}>
                       <Text style={[styles.removeBtnText, { color: t.danger }]}>✕</Text>
                     </TouchableOpacity>
-                  </>
+                  </View>
                 )}
               </View>
             );
