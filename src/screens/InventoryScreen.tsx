@@ -63,7 +63,7 @@ export function InventoryScreen() {
 
       {/* Location filter pills */}
       <View style={styles.pillRow}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center', flexGrow: 1 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center' }}>
           {['All', ...locations].map(l => {
             const active = activeLoc === l;
             return (
