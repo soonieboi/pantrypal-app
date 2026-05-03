@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, Modal, Alert } from 'react-native';
 import { useApp } from '../AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { AddItemSheet } from '../components/AddItemSheet';
@@ -14,7 +14,27 @@ export function BuyListScreen() {
   );
   const [checked, setChecked] = useState<Record<number, boolean>>({});
   const [addVisible, setAddVisible] = useState(false);
+  const [notifyVisible, setNotifyVisible] = useState(false);
+  const [notifyMemberIds, setNotifyMemberIds] = useState<Set<number>>(new Set());
+  const [notifyItemIds, setNotifyItemIds] = useState<Set<number>>(new Set(needItems.map(i => i.id)));
   const defaultMember = members[0]?.name ?? 'You';
+
+  const openNotify = () => {
+    setNotifyMemberIds(new Set());
+    setNotifyItemIds(new Set(needItems.map(i => i.id)));
+    setNotifyVisible(true);
+  };
+
+  const toggleNotifyMember = (id: number) =>
+    setNotifyMemberIds(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const toggleNotifyItem = (id: number) =>
+    setNotifyItemIds(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const sendNotification = () => {
+    setNotifyVisible(false);
+    Alert.alert('Notification queued', 'Email & in-app push notifications are coming in a future update.');
+  };
 
   useEffect(() => {
     setBuyQty(prev => {
@@ -52,6 +72,11 @@ export function BuyListScreen() {
             {checkedCount > 0 && (
               <TouchableOpacity onPress={markBought} style={[styles.boughtBtn, { backgroundColor: t.accent }]}>
                 <Text style={styles.boughtBtnText}>Bought</Text>
+              </TouchableOpacity>
+            )}
+            {needItems.length > 0 && (
+              <TouchableOpacity onPress={openNotify} style={[styles.notifyBtn, { borderColor: t.accent }]}>
+                <Text style={[styles.notifyBtnText, { color: t.accent }]}>🔔 Notify</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => setAddVisible(true)} style={[styles.addBtn, { backgroundColor: t.accent }]}>
@@ -134,6 +159,65 @@ export function BuyListScreen() {
         locIcons={locIcons}
         defaultMember={defaultMember}
       />
+
+      {/* Notify member modal */}
+      <Modal visible={notifyVisible} transparent animationType="slide" onRequestClose={() => setNotifyVisible(false)}>
+        <View style={styles.notifyOverlay}>
+          <TouchableOpacity style={StyleSheet.absoluteFillObject} activeOpacity={1} onPress={() => setNotifyVisible(false)} />
+          <View style={[styles.notifySheet, { backgroundColor: t.bg }]}>
+            <View style={[styles.handle, { backgroundColor: t.border }]} />
+            <Text style={[styles.notifyTitle, { color: t.text }]}>Notify Member</Text>
+            <Text style={[styles.notifySubtitle, { color: t.textSec }]}>Select who to notify and which items to include</Text>
+
+            <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+              <Text style={[styles.notifySectionLabel, { color: t.textSec }]}>MEMBERS</Text>
+              {members.length === 0 ? (
+                <Text style={[styles.notifyEmpty, { color: t.textSec }]}>No other members in this household</Text>
+              ) : members.map(m => (
+                <TouchableOpacity key={m.id} style={[styles.notifyRow, { borderColor: t.border }]} onPress={() => toggleNotifyMember(m.id)}>
+                  <View style={[styles.notifyCheck, { borderColor: notifyMemberIds.has(m.id) ? t.accent : t.border, backgroundColor: notifyMemberIds.has(m.id) ? t.accent : 'transparent' }]}>
+                    {notifyMemberIds.has(m.id) && <Text style={{ color: '#fff', fontSize: 11 }}>✓</Text>}
+                  </View>
+                  <View style={[styles.notifyAvatar, { backgroundColor: m.color }]}>
+                    <Text style={styles.notifyAvatarText}>{m.name[0].toUpperCase()}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.notifyName, { color: t.text }]}>{m.name}</Text>
+                    {!!m.email && <Text style={[styles.notifyEmail, { color: t.textSec }]}>{m.email}</Text>}
+                  </View>
+                </TouchableOpacity>
+              ))}
+
+              <Text style={[styles.notifySectionLabel, { color: t.textSec, marginTop: 16 }]}>ITEMS TO BUY</Text>
+              {needItems.map(item => (
+                <TouchableOpacity key={item.id} style={[styles.notifyRow, { borderColor: t.border }]} onPress={() => toggleNotifyItem(item.id)}>
+                  <View style={[styles.notifyCheck, { borderColor: notifyItemIds.has(item.id) ? t.accent : t.border, backgroundColor: notifyItemIds.has(item.id) ? t.accent : 'transparent' }]}>
+                    {notifyItemIds.has(item.id) && <Text style={{ color: '#fff', fontSize: 11 }}>✓</Text>}
+                  </View>
+                  <Text style={[styles.notifyName, { color: t.text, flex: 1 }]}>{item.name}</Text>
+                  <Text style={[styles.notifyEmail, { color: t.textSec }]}>
+                    {locIcons[item.location] || '📦'} {item.location}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+
+              <Text style={[styles.notifyFooter, { color: t.textSec }]}>
+                📧 Email · 📱 App push (coming soon)
+              </Text>
+            </ScrollView>
+
+            <TouchableOpacity
+              onPress={sendNotification}
+              disabled={notifyMemberIds.size === 0 || notifyItemIds.size === 0}
+              style={[styles.notifySendBtn, { backgroundColor: notifyMemberIds.size > 0 && notifyItemIds.size > 0 ? t.accent : t.border }]}
+            >
+              <Text style={styles.notifySendBtnText}>
+                Send Notification{notifyMemberIds.size > 0 ? ` to ${notifyMemberIds.size} member${notifyMemberIds.size > 1 ? 's' : ''}` : ''}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       </View>
     </SafeAreaView>
   );
@@ -165,4 +249,22 @@ const styles = StyleSheet.create({
   stepValue: { fontSize: 16, fontWeight: '700', minWidth: 32, textAlign: 'center' },
   stepUnit: { fontSize: 12 },
   afterBuying: { fontSize: 11, marginTop: 6, paddingLeft: 2 },
+  notifyBtn: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, borderWidth: 1.5 },
+  notifyBtnText: { fontSize: 12, fontWeight: '600' },
+  notifyOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  notifySheet: { borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: 20, paddingBottom: 36, maxHeight: '80%' },
+  handle: { width: 36, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: 16, backgroundColor: '#ccc' },
+  notifyTitle: { fontSize: 20, fontWeight: '700', marginBottom: 4 },
+  notifySubtitle: { fontSize: 13, marginBottom: 16 },
+  notifySectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 },
+  notifyEmpty: { fontSize: 13, marginBottom: 12 },
+  notifyRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1 },
+  notifyCheck: { width: 22, height: 22, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  notifyAvatar: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  notifyAvatarText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  notifyName: { fontSize: 14, fontWeight: '600' },
+  notifyEmail: { fontSize: 12, marginTop: 1 },
+  notifyFooter: { fontSize: 11, textAlign: 'center', marginTop: 16, marginBottom: 8 },
+  notifySendBtn: { borderRadius: 14, padding: 14, alignItems: 'center', marginTop: 12 },
+  notifySendBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 });
