@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { useApp } from '../AppContext';
 import { AppHeader } from '../components/AppHeader';
+import { AddItemSheet } from '../components/AddItemSheet';
 import { groupBy, pluralize } from '../data';
 
 export function BuyListScreen() {
-  const { theme: t, items, boughtItem, locations, locIcons } = useApp();
+  const { theme: t, items, boughtItem, addItem, locations, locIcons, members } = useApp();
   const needItems = items.filter(i => i.quantity < i.minThreshold);
 
   const [buyQty, setBuyQty] = useState<Record<number, number>>(() =>
     needItems.reduce((acc, i) => ({ ...acc, [i.id]: Math.max(1, Math.round(i.minThreshold - i.quantity)) }), {})
   );
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const [addVisible, setAddVisible] = useState(false);
+  const defaultMember = members[0]?.name ?? 'You';
 
   useEffect(() => {
     setBuyQty(prev => {
@@ -44,11 +47,17 @@ export function BuyListScreen() {
         theme={t}
         title="Buy List"
         subtitle={needItems.length === 0 ? 'All stocked up!' : `${needItems.length} items below threshold`}
-        right={checkedCount > 0
-          ? <TouchableOpacity onPress={markBought} style={[styles.boughtBtn, { backgroundColor: t.accent }]}>
-              <Text style={styles.boughtBtnText}>Bought</Text>
+        right={
+          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+            {checkedCount > 0 && (
+              <TouchableOpacity onPress={markBought} style={[styles.boughtBtn, { backgroundColor: t.accent }]}>
+                <Text style={styles.boughtBtnText}>Bought</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => setAddVisible(true)} style={[styles.addBtn, { backgroundColor: t.accent }]}>
+              <Text style={styles.addBtnText}>+</Text>
             </TouchableOpacity>
-          : undefined
+          </View>
         }
       />
 
@@ -115,6 +124,16 @@ export function BuyListScreen() {
           </View>
         ))}
       </ScrollView>
+
+      <AddItemSheet
+        visible={addVisible}
+        onClose={() => setAddVisible(false)}
+        onAdd={addItem}
+        theme={t}
+        locations={locations}
+        locIcons={locIcons}
+        defaultMember={defaultMember}
+      />
       </View>
     </SafeAreaView>
   );
@@ -123,6 +142,8 @@ export function BuyListScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   inner: { flex: 1, maxWidth: 680, width: '100%', alignSelf: 'center' },
+  addBtn: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  addBtnText: { color: '#fff', fontSize: 22, lineHeight: 26 },
   boughtBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
   boughtBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
   empty: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: 20 },
