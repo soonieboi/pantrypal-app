@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal, View, Text, TextInput, TouchableOpacity,
   ScrollView, StyleSheet, KeyboardAvoidingView, Platform,
@@ -14,18 +14,23 @@ interface Props {
   locations: string[];
   locIcons: Record<string, string>;
   defaultMember: string;
+  defaultLocation?: string;
 }
 
-const DEFAULT_FORM = { name: '', location: 'Pantry', category: '', unit: '', quantity: 1, minThreshold: 2 };
+const makeDefault = (loc: string) => ({ name: '', location: loc, category: '', unit: '', quantity: 1, minThreshold: 2 });
 
-export function AddItemSheet({ visible, onClose, onAdd, theme: t, locations, locIcons, defaultMember }: Props) {
-  const [form, setForm] = useState(DEFAULT_FORM);
+export function AddItemSheet({ visible, onClose, onAdd, theme: t, locations, locIcons, defaultMember, defaultLocation }: Props) {
+  const [form, setForm] = useState(() => makeDefault(defaultLocation || locations[0] || 'Pantry'));
   const upd = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
+
+  useEffect(() => {
+    if (visible) setForm(makeDefault(defaultLocation || locations[0] || 'Pantry'));
+  }, [visible, defaultLocation]);
 
   const submit = () => {
     if (!form.name.trim()) return;
     onAdd({ ...form, addedBy: defaultMember });
-    setForm(DEFAULT_FORM);
+    setForm(makeDefault(defaultLocation || locations[0] || 'Pantry'));
     onClose();
   };
 

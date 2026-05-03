@@ -66,7 +66,7 @@ export function InventoryScreen() {
 
         {/* Location filter pills */}
         <View style={styles.pillRow}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center' }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center' }}>
             {['All', ...locations].map(l => {
               const active = activeLoc === l;
               return (
@@ -121,6 +121,7 @@ export function InventoryScreen() {
           locations={locations}
           locIcons={locIcons}
           defaultMember={defaultMember}
+          defaultLocation={activeLoc !== 'All' ? activeLoc : locations[0]}
         />
 
         <ItemDetailSheet
