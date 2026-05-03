@@ -26,6 +26,7 @@ interface AppState {
   addLocation: (name: string, icon: string) => void;
   deleteLocation: (name: string, withItems?: boolean) => void;
   renameLocation: (oldName: string, newName: string, newIcon: string) => void;
+  reorderLocations: (newOrder: string[]) => void;
 }
 
 const AppContext = createContext<AppState>(null as any);
@@ -140,13 +141,17 @@ export function AppProvider({ householdId, children }: Props) {
     });
   }, [householdId, locations, locIcons, items]);
 
+  const reorderLocations = useCallback((newOrder: string[]) => {
+    updateDoc(householdRef, { locations: newOrder });
+  }, [householdId]);
+
   return (
     <AppContext.Provider value={{
       householdId, inviteCode,
       theme: THEMES[themeId] ?? THEMES.sage,
       items, members, locations, locIcons,
       updateQty, updateThreshold, updateItem, addItem, deleteItem, boughtItem,
-      addMember, removeMember, addLocation, deleteLocation, renameLocation,
+      addMember, removeMember, addLocation, deleteLocation, renameLocation, reorderLocations,
     }}>
       {children}
     </AppContext.Provider>

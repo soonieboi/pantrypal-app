@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, SafeAreaView, useWindowDimensions } from 'react-native';
+
 import { useApp } from '../AppContext';
 import { AppHeader } from '../components/AppHeader';
 import { ItemCard } from '../components/ItemCard';
 import { AddItemSheet } from '../components/AddItemSheet';
 import { ItemDetailSheet } from '../components/ItemDetailSheet';
+import { DraggablePillRow } from '../components/DraggablePillRow';
 import { Item } from '../types';
 import { groupBy } from '../data';
 
 export function InventoryScreen() {
-  const { theme: t, items, updateQty, updateThreshold, updateItem, addItem, deleteItem, locations, locIcons, members } = useApp();
+  const { theme: t, items, updateQty, updateThreshold, updateItem, addItem, deleteItem, locations, locIcons, members, reorderLocations } = useApp();
   const { width } = useWindowDimensions();
   const [search, setSearch] = useState('');
   const [activeLoc, setActiveLoc] = useState('All');
@@ -64,24 +66,15 @@ export function InventoryScreen() {
           )}
         </View>
 
-        {/* Location filter pills */}
-        <View style={styles.pillRow}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, alignItems: 'center' }}>
-            {['All', ...locations].map(l => {
-              const active = activeLoc === l;
-              return (
-                <TouchableOpacity
-                  key={l}
-                  onPress={() => setActiveLoc(l)}
-                  style={[styles.pill, { backgroundColor: active ? t.accent : t.card, borderColor: active ? t.accent : t.border }]}
-                >
-                  <Text style={{ fontSize: 14 }}>{l === 'All' ? '🏠' : (locIcons[l] || '📦')}</Text>
-                  <Text style={{ fontSize: 13, fontWeight: active ? '600' : '400', color: active ? '#fff' : t.textSec }}>{l}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+        {/* Location filter pills — long-press any pill to enter reorder mode */}
+        <DraggablePillRow
+          locations={locations}
+          locIcons={locIcons}
+          activeLoc={activeLoc}
+          onSelectLoc={setActiveLoc}
+          onReorder={reorderLocations}
+          theme={t}
+        />
 
         {/* Items */}
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingTop: 10, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
@@ -148,8 +141,6 @@ const styles = StyleSheet.create({
   addBtnText: { color: '#fff', fontSize: 24, lineHeight: 28 },
   searchBar: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginVertical: 8, borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 9, gap: 8 },
   searchInput: { flex: 1, fontSize: 15 },
-  pillRow: { height: 46, justifyContent: 'center' },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 6, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5 },
   locHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 16, marginBottom: 10 },
   locLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
