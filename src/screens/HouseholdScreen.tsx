@@ -48,6 +48,7 @@ export function HouseholdScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: t.bg }]}>
+      <View style={styles.inner}>
       <AppHeader
         theme={t}
         title="Household"
@@ -194,12 +195,14 @@ export function HouseholdScreen() {
           ))}
         </View>
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  inner: { flex: 1, maxWidth: 680, width: '100%', alignSelf: 'center' },
   signOutBtn: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, marginTop: 6 },
   signOutText: { fontSize: 13 },
   inviteCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginBottom: 16, borderRadius: 14, borderWidth: 1, padding: 16 },

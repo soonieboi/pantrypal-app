@@ -39,6 +39,7 @@ export function BuyListScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: t.bg }]}>
+      <View style={styles.inner}>
       <AppHeader
         theme={t}
         title="Buy List"
@@ -114,12 +115,14 @@ export function BuyListScreen() {
           </View>
         ))}
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  inner: { flex: 1, maxWidth: 680, width: '100%', alignSelf: 'center' },
   boughtBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10 },
   boughtBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
   empty: { alignItems: 'center', paddingVertical: 80, paddingHorizontal: 20 },
