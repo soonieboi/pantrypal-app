@@ -77,21 +77,6 @@ export function HouseholdScreen() {
         }
       />
 
-      {/* Invite code card */}
-      {!!inviteCode && (
-        <TouchableOpacity
-          onPress={() => Share.share({ message: `Join my PantryPal household! Code: ${inviteCode}` })}
-          style={[styles.inviteCard, { backgroundColor: t.accentLight, borderColor: t.accent + '40' }]}
-          activeOpacity={0.8}
-        >
-          <View>
-            <Text style={[styles.inviteLabel, { color: t.accent }]}>INVITE CODE — tap to share</Text>
-            <Text style={[styles.inviteCode, { color: t.accent }]}>{inviteCode}</Text>
-          </View>
-          <Text style={{ fontSize: 20 }}>🔗</Text>
-        </TouchableOpacity>
-      )}
-
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 30 }} showsVerticalScrollIndicator={false}>
 
         {/* Members */}
@@ -247,6 +232,21 @@ export function HouseholdScreen() {
             </View>
           ))}
         </View>
+
+        {/* Invite code — at the bottom */}
+        {!!inviteCode && (
+          <TouchableOpacity
+            onPress={() => Share.share({ message: `Join my PantryPal household! Code: ${inviteCode}` })}
+            style={[styles.inviteCard, { backgroundColor: t.accentLight, borderColor: t.accent + '40', marginTop: 24 }]}
+            activeOpacity={0.8}
+          >
+            <View>
+              <Text style={[styles.inviteLabel, { color: t.accent }]}>INVITE CODE — tap to share</Text>
+              <Text style={[styles.inviteCodeText, { color: t.accent }]}>{inviteCode}</Text>
+            </View>
+            <Text style={{ fontSize: 20 }}>🔗</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
       </View>
     </SafeAreaView>
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   signOutText: { fontSize: 13 },
   inviteCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginBottom: 16, borderRadius: 14, borderWidth: 1, padding: 16 },
   inviteLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
-  inviteCode: { fontSize: 28, fontWeight: '800', letterSpacing: 6 },
+  inviteCodeText: { fontSize: 28, fontWeight: '800', letterSpacing: 6 },
   sectionLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 10 },
   card: { borderRadius: 16, borderWidth: 1, overflow: 'hidden', backgroundColor: '#fff' },
   memberRow: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
