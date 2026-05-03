@@ -102,7 +102,6 @@ export function BuyListScreen() {
             {grouped[loc].map(item => {
               const isChecked = !!checked[item.id];
               const qty = buyQty[item.id] || 1;
-              const willReach = +(item.quantity + qty).toFixed(1);
               const isOut = item.quantity === 0;
 
               return (
@@ -136,13 +135,6 @@ export function BuyListScreen() {
                     </TouchableOpacity>
                     <Text style={[styles.stepUnit, { color: t.textSec }]}>{item.unit}</Text>
                   </View>
-
-                  <Text style={[styles.afterBuying, { color: t.textSec }]}>
-                    Stock after buying:{' '}
-                    <Text style={{ fontWeight: '600', color: willReach >= item.minThreshold ? t.accent : t.warn }}>
-                      {willReach} {pluralize(willReach, item.unit)}
-                    </Text>
-                  </Text>
                 </View>
               );
             })}
@@ -248,7 +240,6 @@ const styles = StyleSheet.create({
   stepBtnText: { fontSize: 16 },
   stepValue: { fontSize: 16, fontWeight: '700', minWidth: 32, textAlign: 'center' },
   stepUnit: { fontSize: 12 },
-  afterBuying: { fontSize: 11, marginTop: 6, paddingLeft: 2 },
   notifyBtn: { paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, borderWidth: 1.5 },
   notifyBtnText: { fontSize: 12, fontWeight: '600' },
   notifyOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
